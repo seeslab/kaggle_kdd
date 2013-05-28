@@ -16,7 +16,7 @@ def get_valid():
     papers = {}
     for line in lines:
         aid, paps = line.strip().split(',')
-        papers[aid] = paps.split()
+        papers[int(aid)] = [int(p) for p in paps.split()]
     return papers
 
 def get_author_papers():

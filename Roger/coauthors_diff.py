@@ -95,7 +95,6 @@ if __name__ == '__main__':
             min(naids, doNAuthors * (startAuthorBatch - 1)) :
             min(naids, doNAuthors * startAuthorBatch)
             ]
-    outf = open('coauthors_diff.valid.dat', 'a')
     for aid in aids:
         allPapers = validation[aid]
         for p1 in allPapers:
@@ -103,5 +102,6 @@ if __name__ == '__main__':
             zs, s = get_paper_score(p1, others, papers, authors,
                                     nstep=10, npath=25)
             if zs != None and s != None:
-                print >> outf, aid, p1, s, zs
-    outf.close()
+                ## outf = open('coauthors_diff.valid.dat', 'a')
+                print >> sys.stdout, aid, p1, s, zs
+                ## outf.close()

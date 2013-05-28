@@ -1,8 +1,0 @@
-Reading data...
-Calculating validation scores...
-/opt/python/lib/python2.7/site-packages/numpy/core/_methods.py:72: RuntimeWarning: invalid value encountered in true_divide
-  out=arrmean, casting='unsafe', subok=False)
-/opt/python/lib/python2.7/site-packages/numpy/core/_methods.py:96: RuntimeWarning: invalid value encountered in double_scalars
-  ret = ret / float(rcount)
-/opt/python/lib/python2.7/site-packages/numpy/core/_methods.py:57: RuntimeWarning: invalid value encountered in double_scalars
-  ret = ret / float(rcount)

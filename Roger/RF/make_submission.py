@@ -9,7 +9,7 @@ sys.path.append('..')
 from common import get_valid
 
 COLUMNS = (
-    ('TF', '../venue', 4),
+    ('TF', '../npapers', 4),
     ('venue', '../venue', 3),
     ('name', '../name', 3),
     ## ('nameinit', '../name.results.dat', 4),
@@ -68,7 +68,8 @@ if __name__ == '__main__':
     validDataCols = dict(
         [(colName,
           read_data_col('%s.valid.dat' % fileName, valCol=valCol))
-         for colName, fileName, valCol in COLUMNS]
+         for colName, fileName, valCol in COLUMNS
+         if colName != 'TF']
         )
 
     # Create ordered list of papers for each author in the validation set

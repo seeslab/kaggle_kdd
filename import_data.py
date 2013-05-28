@@ -98,7 +98,7 @@ def import_data():
 
 @task
 def countAuthors():
-    for author in Author.objects.filter(id<100):
+    for author in Author.objects.all()[:10]:
         print author.name
 
 @task
