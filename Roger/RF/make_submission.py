@@ -10,10 +10,10 @@ from common import get_valid
 
 COLUMNS = (
     ('TF', '../npapers', 4),
-    ('venue', '../venue', 3),
-    ('name', '../name', 3),
+#    ('venue', '../venue', 3),
+#    ('name', '../name', 3),
     ## ('nameinit', '../name.results.dat', 4),
-    ('nname', '../nname', 3),
+#    ('nname', '../nname', 3),
     ('npapers', '../npapers', 3),
     ('nauthors', '../nauthors', 3),
     ## ('coauthors', '../coauthors_diff', 3),
@@ -26,7 +26,8 @@ def train_models(columns, rf=True, svm=False, logit=False):
     dataCols = dict(
         [(colName,
           read_data_col('%s.train.dat' % fileName, valCol=valCol))
-         for colName, fileName, valCol in columns]
+         for colName, fileName, valCol in COLUMNS
+         if colName in columns or colName == 'TF']
         )
     data, colnames = create_matrix(dataCols)
     cimt = colnames.index('TF')
@@ -57,7 +58,7 @@ def train_models(columns, rf=True, svm=False, logit=False):
         logitModel.fit(x, y)
         models['logit'] = logitModel
 
-    return {'models' : models, 'colnames' : colnames}
+    return {'models' : models, 'colnames' : [c for c in colnames if c!='TF']}
 
         
 if __name__ == '__main__':
@@ -82,18 +83,18 @@ if __name__ == '__main__':
                     for col in validDataCols
                     if validDataCols[col][aid].has_key(pid)]
             cols.sort()
+            print aid, pid, cols
             # train the model if necessary (i.e. if this is the first
             # time we see exactly these columns)
             modelName = '_'.join(cols)
             if modelName not in models:
-                models[modelName] = train_models(columns)
+                models[modelName] = train_models(cols)
             # validation columns
-            xValid = [validDataCols[col][aid][pid]
-                      for col in models[modelName]['colnames']]
+            xValid = np.array([validDataCols[col][aid][pid]
+                               for col in models[modelName]['colnames']])
             # make the prediction
-            decorated.append(
-                (models[modelName]['models']['rf'].predict_proba(xValid)[1],
-                 pid)
-                )
+            print xValid
+            score = models[modelName]['models']['rf'].predict_proba(xValid)[1]
+            decorated.append((score, pid))
         decorated.sort()
         print aid, decorated
