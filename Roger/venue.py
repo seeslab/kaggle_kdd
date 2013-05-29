@@ -3,8 +3,21 @@ from copy import deepcopy
 from numpy import log
 
 from common import get_author_papers, get_train, get_valid
+from kaggle_kdd.models import *
+from fabric.api import *
 
-def get_venue():
+
+def get_venue_db():
+    venue = {}
+    for paper in Paper.objects.filter(journal__isnull=False).values('id','journal'):
+        venue[ paper['id'] ] = 'J%d' % paper['journal']
+    for paper in Paper.objects.filter(conference__isnull=False).values('id','conference'):
+        venue[ paper['id'] ] = 'C%d' % paper['conference']
+
+    return venue
+
+
+def get_venue_file():
     venue, linestr = {}, ''
     lines = open('Data/Paper.csv').readlines()[1:]
     for line in lines:
@@ -36,7 +49,8 @@ def get_venue():
             linestr = ''
             pass
     return venue
-    
+
+
 
 def get_ps(confirmed, venue):
     # n1(v1) and n2(v1, v2), and their normalizations
@@ -116,8 +130,13 @@ def ps_without_author(aid, confirmed, venue, P1All, P2All, norm1All, norm2All):
                 (norm2All - norm2)
     return P1, P2
 
-if __name__ == '__main__':
-    venue = get_venue()
+
+@task
+def compute_venue_score():
+    venue = get_venue_db()
+    # print len(venue)
+    # import sys
+    # sys.exit()
 
     confirmed, deleted = get_train()
     P1All, P2All, norm1All, norm2All = get_ps(confirmed, venue)
@@ -161,3 +180,6 @@ if __name__ == '__main__':
             if s > -.5 :
                 print >> outf, aid, p1, s
     outf.close()
+
+if __name__ == '__main__':
+    compute_venue_score()
