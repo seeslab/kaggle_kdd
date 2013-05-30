@@ -13,3 +13,5 @@ import Roger.nauthors
 import Roger.nvenue
 import Roger.name
 import Roger.affiliation
+
+import Roger.sumcoauthors

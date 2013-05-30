@@ -37,6 +37,8 @@ nosetests.xml
 #SPECIFIC FILES
 qsub.sh.*
 *~
+.idea
+data
 Data/
 Old/
 nohup.out
