@@ -1,15 +1,12 @@
 import sys
-import gc
-from copy import deepcopy
-from random import choice
-from numpy import log, mean, std
-from scipy.misc import factorial
-from scipy.sparse import coo_matrix
-import scipy.sparse.linalg as sp
 
 from common import get_author_papers, get_train, get_valid
 
-if __name__ == '__main__':
+from kaggle_kdd.models import *
+from fabric.api import *
+
+@task
+def get_nauthors():
     print >> sys.stderr, 'Reading data...'
     papers, authors = get_author_papers()
     confirmed, deleted = get_train()
@@ -35,3 +32,7 @@ if __name__ == '__main__':
         for p1 in allPapers:
             print >> outf, aid, p1, len(authors[p1])
     outf.close()
+    
+
+if __name__ == '__main__':
+    get_nauthors()

@@ -7,20 +7,34 @@ from sklearn.feature_extraction import DictVectorizer
 
 from  common_predict import read_data_col, create_matrix
 sys.path.append('..')
-from common import get_valid
+#from common import get_valid
 
 COLUMNS = (
     ('TF', '../npapers', 4),
+    ('njournal', '../nvenue', 3),
+    ('nconference', '../nvenue', 4),
     ('venue', '../venue', 3),
     ('name', '../name', 3),
     ## ('nameinit', '../name.results.dat', 4),
-    ('nname', '../nname', 3),
+#    ('nname', '../nname', 3),
     ('npapers', '../npapers', 3),
     ('nauthors', '../nauthors', 3),
-    ('coauthors', '../coauthors_diff', 3),
+#    ('coauthors', '../coauthors_diff', 3),
     ## ('zcoauthors', '../coauthors_diff', 4),
     ## ('affiliation', '../paper_affil', 3),
     )
+
+def get_valid():
+    try:
+        lines = open('Data/Valid.csv').readlines()[1:]
+    except IOError:
+        lines = open('../Data/Valid.csv').readlines()[1:]
+    papers = {}
+    for line in lines:
+        aid, paps = line.strip().split(',')
+        papers[int(aid)] = [int(p) for p in paps.split()]
+    return papers
+
 
 def train_models(columns, rf=True, svm=False, logit=False):
     # Prepare the data
@@ -64,8 +78,9 @@ def train_models(columns, rf=True, svm=False, logit=False):
 
     return {'models' : models, 'colnames' : [c for c in colnames if c!='TF']}
 
-        
-if __name__ == '__main__':
+
+#@task
+def make_submission():
     # Read validation file
     validation = get_valid()
 
@@ -126,7 +141,7 @@ if __name__ == '__main__':
                 decorated[aid] = [(score, pid)]
 
     # Create the file
-    outf = open('submit_%s.csv' % strftime("%d%m%Y_%H:%M:%S", localtime()), 'w')
+    outf = open('submit_%s.csv' % strftime("%Y%m%d_%H:%M:%S", localtime()), 'w')
     print >> outf, 'AuthorId,PaperIds'
     for aid in decorated:
         sortedPapers = decorated[aid]
@@ -134,3 +149,7 @@ if __name__ == '__main__':
         print >> outf, \
               str(aid) + ',' + ' '.join([str(pid) for s, pid in sortedPapers])
     outf.close()
+
+        
+if __name__ == '__main__':
+    make_submission()

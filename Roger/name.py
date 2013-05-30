@@ -5,6 +5,9 @@ from Bio.pairwise2 import align
 
 from common import get_author_papers, get_train, get_valid
 
+from kaggle_kdd.models import *
+from fabric.api import *
+
 def clean_name(n):
     n = n.replace('.', ' ')
     n = n.strip().upper()
@@ -15,6 +18,13 @@ def initialize_name(n):
     return ' '.join([s[0] for s in n.split()][:-1] + [n.split()[-1]])
 
 def name_align_score(n1, n2):
+    if n1 == '' and n2 == '':
+        return -3, -3
+    elif n1 == '':
+        return -1, -1
+    elif n2 == '':
+        return -2, -2
+
     # Full name
     maxScoreFull = 0
     alignment = align.globalxx(clean_name(n1), clean_name(n2))
@@ -35,39 +45,28 @@ def name_align_score(n1, n2):
     # Done
     return maxScoreFull, maxScoreIni
 
+
 def get_base_name():
-    name, linestr = {}, ''
-    lines = open('Data/Author.csv').readlines()[1:]
-    for line in lines:
-        linestr += line.strip()
-        try:
-            authorid = linestr.strip().split(',')[0]
-            thename = linestr.strip().split(',')[1]
-            name[authorid] = thename
-            linestr = ''
-            ## print >> sys.stderr, paperid, kws[paperid]
-        except IndexError:
-            pass
+    name = {}
+    for author in Author.objects.all():
+        name[author.id] = author.name
     return name
 
 def get_paper_name():
-    name, linestr = {}, ''
-    lines = open('Data/PaperAuthor.csv').readlines()[1:5000000]
-    for line in lines:
+    name = {}
+    for pa in PaperAuthor.objects.all():
         try:
-            paperid = line.strip().split(',')[0]
-            authorid = line.strip().split(',')[1]
-            thename = line.strip().split(',')[2]
-            if authorid not in name:
-                name[authorid] = {}
-            name[authorid][paperid] = thename
-        except IndexError:
-            pass
+            name[pa.authorId][pa.paperId] = pa.name
+        except KeyError:
+            name[pa.authorId] = {pa.paperId : pa.name}
     return name
 
-if __name__ == '__main__':
-    baseName = get_base_name()
+@task
+def get_name_score():
+    print >> sys.stderr, 'Loading author-paper table...'
     paperName = get_paper_name()
+    print >> sys.stderr, 'Loading author reference names...'
+    baseName = get_base_name()
 
     confirmed, deleted = get_train()
     outf = open('name.train.dat', 'w')
@@ -101,3 +100,7 @@ if __name__ == '__main__':
             except KeyError:
                 pass
     outf.close()
+
+
+if __name__ == '__main__':
+    get_name_score()
