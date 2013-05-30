@@ -1,4 +1,4 @@
-import sys
+ sys
 from time import strftime, localtime
 import numpy as np
 from random import choice, shuffle
@@ -150,6 +150,10 @@ def make_submission():
               str(aid) + ',' + ' '.join([str(pid) for s, pid in sortedPapers])
     outf.close()
 
+    # Create the info file
+    outf = open('submit_%s.info' % strftime("%Y%m%d_%H:%M:%S", localtime()), 'w')
+    print >> outf, '\n'.join([str(c) for c in COLUMNS])
+    outf.close()
         
 if __name__ == '__main__':
     make_submission()
