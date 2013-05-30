@@ -12,3 +12,5 @@ import Roger.npapers
 import Roger.nauthors
 import Roger.nvenue
 import Roger.name
+
+import Roger.sumcoauthors
