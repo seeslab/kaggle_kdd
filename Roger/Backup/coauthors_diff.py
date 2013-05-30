@@ -62,26 +62,46 @@ if __name__ == '__main__':
 
     print >> sys.stderr, 'Reading data...'
     papers, authors = get_author_papers()
-    confirmed, deleted = get_train()
+    ## confirmed, deleted = get_train()
 
-    print >> sys.stderr, 'Calculating scores...'
-    aids = confirmed.keys()[:]
+    ## print >> sys.stderr, 'Calculating training scores...'
+    ## aids = confirmed.keys()[:]
+    ## naids = len(aids)
+    ## if doNAuthors != None:
+    ##     aids = confirmed.keys()[
+    ##         min(naids, doNAuthors * (startAuthorBatch - 1)) :
+    ##         min(naids, doNAuthors * startAuthorBatch)
+    ##         ]
+    ## for aid in aids:
+    ##     allPapers = confirmed[aid] + deleted[aid]
+    ##     for p1 in allPapers:
+    ##         if p1 in confirmed[aid]:
+    ##             tf = 'T'
+    ##         else:
+    ##             tf = 'F'
+    ##         others = [p for p in allPapers if p != p1]
+    ##         zs, s = get_paper_score(p1, others, papers, authors,
+    ##                                 nstep=10, npath=25)
+    ##         if zs != None and s != None:
+    ##             print aid, p1, s, zs, tf
+
+
+    print >> sys.stderr, 'Calculating validation scores...'
+    validation = get_valid()
+    aids = validation.keys()[:]
     naids = len(aids)
     if doNAuthors != None:
-        aids = confirmed.keys()[
+        aids = validation.keys()[
             min(naids, doNAuthors * (startAuthorBatch - 1)) :
             min(naids, doNAuthors * startAuthorBatch)
             ]
-
     for aid in aids:
-        allPapers = confirmed[aid] + deleted[aid]
+        allPapers = validation[aid]
         for p1 in allPapers:
-            if p1 in confirmed[aid]:
-                tf = 'T'
-            else:
-                tf = 'F'
             others = [p for p in allPapers if p != p1]
             zs, s = get_paper_score(p1, others, papers, authors,
                                     nstep=10, npath=25)
             if zs != None and s != None:
-                print aid, p1, s, zs, tf
+                ## outf = open('coauthors_diff.valid.dat', 'a')
+                print >> sys.stdout, aid, p1, s, zs
+                ## outf.close()

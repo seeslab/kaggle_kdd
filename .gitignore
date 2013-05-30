@@ -37,3 +37,7 @@ nosetests.xml
 #SPECIFIC FILES
 qsub.sh.*
 *~
+Data/
+Old/
+nohup.out
+kk.dat

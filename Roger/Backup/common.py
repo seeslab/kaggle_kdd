@@ -9,16 +9,22 @@ import scipy.sparse.linalg as sp
 
 
 def get_valid():
-    lines = open('Data/Valid.csv').readlines()[1:]
+    try:
+        lines = open('Data/Valid.csv').readlines()[1:]
+    except IOError:
+        lines = open('../Data/Valid.csv').readlines()[1:]
     papers = {}
     for line in lines:
         aid, paps = line.strip().split(',')
-        papers[aid] = paps.split()
+        papers[int(aid)] = [int(p) for p in paps.split()]
     return papers
 
 def get_author_papers():
     papers, authors = {}, {}
-    lines = open('Data/PaperAuthor.csv').readlines()[1:]
+    try:
+        lines = open('Data/PaperAuthor.csv').readlines()[1:]
+    except IOError:
+        lines = open('../Data/PaperAuthor.csv').readlines()[1:]        
     for line in lines:
         try:
             paperid = line.strip().split(',')[0]
