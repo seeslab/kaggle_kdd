@@ -7,3 +7,4 @@ import Roger
 import import_data
 
 import Roger.venue
+import Roger.titles

@@ -1,53 +1,19 @@
 import sys
 from copy import deepcopy
-from numpy import log
 
-from common import get_author_papers, get_train, get_valid
+from common import get_train, get_valid
+
 from kaggle_kdd.models import *
 from fabric.api import *
 
 
-def get_venue_db():
+def get_venue():
     venue = {}
     for paper in Paper.objects.filter(journal__isnull=False).values('id','journal'):
         venue[ paper['id'] ] = 'J%d' % paper['journal']
     for paper in Paper.objects.filter(conference__isnull=False).values('id','conference'):
         venue[ paper['id'] ] = 'C%d' % paper['conference']
 
-    return venue
-
-
-def get_venue_file():
-    venue, linestr = {}, ''
-    lines = open('Data/Paper.csv').readlines()[1:]
-    for line in lines:
-        linestr += line.strip()
-        try:
-            paperid = linestr.strip().split(',')[0]
-            kwstring = linestr.strip().split(',')[5]
-            title = linestr.strip().split(',')[1]
-            confid= int(linestr.strip().split(',')[3])
-            jourid= int(linestr.strip().split(',')[4])
-            """            if confid > 0 and jourid > 0:
-                raise
-            elif confid > 0:
-                venue[paperid] = 'C%d' % confid
-            elif jourid > 0:
-                venue[paperid] = 'J%d' % jourid
-            else:
-                venue[paperid] = '-'
-                """
-            if jourid > 0 or confid > 0:
-                if jourid > confid:
-                    venue[paperid] = 'J%d' % jourid
-                else:
-                    venue[paperid] = 'C%d' % confid
-            linestr = ''
-        except IndexError:
-            pass
-        except ValueError:
-            linestr = ''
-            pass
     return venue
 
 
@@ -133,10 +99,7 @@ def ps_without_author(aid, confirmed, venue, P1All, P2All, norm1All, norm2All):
 
 @task
 def compute_venue_score():
-    venue = get_venue_db()
-    # print len(venue)
-    # import sys
-    # sys.exit()
+    venue = get_venue()
 
     confirmed, deleted = get_train()
     P1All, P2All, norm1All, norm2All = get_ps(confirmed, venue)
