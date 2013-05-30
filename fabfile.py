@@ -8,3 +8,7 @@ import import_data
 
 import Roger.venue
 import Roger.titles
+import Roger.npapers
+import Roger.nauthors
+import Roger.nvenue
+import Roger.name

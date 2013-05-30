@@ -8,16 +8,18 @@ from  common_predict import read_data_col, create_matrix
 F = 0.95
 
 COLUMNS = (
-    ('TF', '../venue.results.dat', 4),
-    ('venue', '../venue.results.dat', 3),
-    ('name', '../name.results.dat', 3),
-    ## ('nameinit', '../name.results.dat', 4),
-    ('nname', '../nname.results.dat', 3),
-    ('npapers', '../npapers.results.dat', 3),
-    ('nauthors', '../nauthors.results.dat', 3),
-    ('coauthors', '../coauthors_diff.train.dat', 3),
-    ## ('zcoauthors', '../coauthors_diff.results.dat', 4),
-    ('affiliation', '../paper_affil.train.dat', 3),
+    ('TF', '../npapers.train.dat', 4),
+    ('venue', '../venue.train.dat', 3),
+    ('njournal', '../nvenue.train.dat', 3),
+    ('nconference', '../nvenue.train.dat', 4),
+#    ('name', '../name.train.dat', 3),
+    ## ('nameinit', '../name.train.dat', 4),
+#    ('nname', '../nname.train.dat', 3),
+    ('npapers', '../npapers.train.dat', 3),
+    ('nauthors', '../nauthors.train.dat', 3),
+#    ('coauthors', '../coauthors_diff.train.dat', 3),
+    ## ('zcoauthors', '../coauthors_diff.train.dat', 4),
+#    ('affiliation', '../paper_affil.train.dat', 3),
     )
 
 if __name__ == '__main__':
