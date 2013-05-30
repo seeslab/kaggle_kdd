@@ -1,4 +1,5 @@
 import sys
+from time import strftime, localtime
 import numpy as np
 from random import choice, shuffle
 from sklearn import ensemble, svm, linear_model
@@ -10,13 +11,13 @@ from common import get_valid
 
 COLUMNS = (
     ('TF', '../npapers', 4),
-#    ('venue', '../venue', 3),
-#    ('name', '../name', 3),
+    ('venue', '../venue', 3),
+    ('name', '../name', 3),
     ## ('nameinit', '../name.results.dat', 4),
-#    ('nname', '../nname', 3),
+    ('nname', '../nname', 3),
     ('npapers', '../npapers', 3),
     ('nauthors', '../nauthors', 3),
-    ## ('coauthors', '../coauthors_diff', 3),
+    ('coauthors', '../coauthors_diff', 3),
     ## ('zcoauthors', '../coauthors_diff', 4),
     ## ('affiliation', '../paper_affil', 3),
     )
@@ -33,6 +34,9 @@ def train_models(columns, rf=True, svm=False, logit=False):
     cimt = colnames.index('TF')
     y = data[:, cimt]
     x = data[:, [c for c in range(len(colnames)) if c != cimt]]
+
+    print >> sys.stderr, '\n>> Training model with cols:', colnames
+    print >> sys.stderr, x
 
     # Fit the models
     models = {}
@@ -73,28 +77,60 @@ if __name__ == '__main__':
          if colName != 'TF']
         )
 
-    # Create ordered list of papers for each author in the validation set
-    models = {}
+    # Train the models and prepare the validation sets
+    models, xValid, pairsAP = {}, {}, {}
     for aid in validation:
-        decorated = []
         for pid in validation[aid]:
             # the available columns for this author-paper pair
-            cols = [col
-                    for col in validDataCols
-                    if validDataCols[col][aid].has_key(pid)]
+            try:
+                cols = [col
+                        for col in validDataCols
+                        if validDataCols[col].has_key(aid)
+                        and validDataCols[col][aid].has_key(pid)]
+            except:
+                print aid, pid, aid in validDataCols[col].keys()
+                raise ValueError
             cols.sort()
-            print aid, pid, cols
             # train the model if necessary (i.e. if this is the first
             # time we see exactly these columns)
             modelName = '_'.join(cols)
             if modelName not in models:
                 models[modelName] = train_models(cols)
+                xValid[modelName] = []
+                pairsAP[modelName] = []
             # validation columns
-            xValid = np.array([validDataCols[col][aid][pid]
-                               for col in models[modelName]['colnames']])
-            # make the prediction
-            print xValid
-            score = models[modelName]['models']['rf'].predict_proba(xValid)[1]
-            decorated.append((score, pid))
-        decorated.sort()
-        print aid, decorated
+            xValid[modelName].append(
+                np.array([validDataCols[col][aid][pid]
+                          for col in models[modelName]['colnames']])
+                )
+            pairsAP[modelName].append((aid, pid))
+        
+    # Make the predictions
+    decorated = {}
+    for modelName in models:
+        print >> sys.stderr, '\n>> Making predictions for cols:', modelName
+        # make all predictions for this model
+        print >> sys.stderr, np.array(xValid[modelName])
+        print >> sys.stderr, np.array(xValid[modelName]).shape
+        pred = models[modelName]['models']['rf'].predict_proba(
+            np.array(xValid[modelName])
+            )
+        print >> sys.stderr, pred
+        # extract author-paper scores
+        for n in range(len(pairsAP[modelName])):
+            aid, pid = pairsAP[modelName][n]
+            score = pred[n, 0]
+            try:
+                decorated[aid].append((score, pid))
+            except KeyError:
+                decorated[aid] = [(score, pid)]
+
+    # Create the file
+    outf = open('submit_%s.csv' % strftime("%d%m%Y_%H:%M:%S", localtime()), 'w')
+    print >> outf, 'AuthorId,PaperIds'
+    for aid in decorated:
+        sortedPapers = decorated[aid]
+        sortedPapers.sort()
+        print >> outf, \
+              str(aid) + ',' + ' '.join([str(pid) for s, pid in sortedPapers])
+    outf.close()

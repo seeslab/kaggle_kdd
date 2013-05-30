@@ -3,6 +3,8 @@ import re
 from numpy import mean
 from Bio.pairwise2 import align
 
+from common import get_author_papers, get_train, get_valid
+
 def clean_name(n):
     n = n.replace('.', ' ')
     n = n.strip().upper()
@@ -63,36 +65,39 @@ def get_paper_name():
             pass
     return name
 
-def get_train():
-    lines = open('Data/Train.csv').readlines()[1:]
-    confirmed, deleted = {}, {}
-    for line in lines:
-        aid, conf, dele = line.strip().split(',')
-        confirmed[aid] = conf.split()
-        deleted[aid] = dele.split()
-    return confirmed, deleted
-
-
 if __name__ == '__main__':
-    confirmed, deleted = get_train()
     baseName = get_base_name()
     paperName = get_paper_name()
 
+    confirmed, deleted = get_train()
+    outf = open('name.train.dat', 'w')
     for aid in confirmed:
         all = confirmed[aid] + deleted[aid]
-
         for pid in confirmed[aid]:
             try:
                 sFull, sInit = name_align_score(paperName[aid][pid],
                                                 baseName[aid])
-                print >> sys.stderr, aid, pid, sFull, sInit, 'T'
+                print >> outf, aid, pid, sFull, sInit, 'T'
             except KeyError:
                 pass
         for pid in deleted[aid]:
             try:
                 sFull, sInit = name_align_score(paperName[aid][pid],
                                                 baseName[aid])
-                print >> sys.stderr, aid, pid, sFull, sInit, 'F'
+                print >> outf, aid, pid, sFull, sInit, 'F'
             except KeyError:
                 pass
+    outf.close()
         
+    validation = get_valid()
+    outf = open('name.valid.dat', 'w')
+    for aid in validation:
+        all = validation[aid]
+        for pid in all:
+            try:
+                sFull, sInit = name_align_score(paperName[aid][pid],
+                                                baseName[aid])
+                print >> outf, aid, pid, sFull, sInit
+            except KeyError:
+                pass
+    outf.close()

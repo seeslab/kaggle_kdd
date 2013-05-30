@@ -2,20 +2,7 @@ import sys
 from copy import deepcopy
 from numpy import log
 
-def get_author_papers():
-    papers = {}
-    lines = open('Data/PaperAuthor.csv').readlines()[1:]
-    for line in lines:
-        try:
-            paperid = line.strip().split(',')[0]
-            authorid = line.strip().split(',')[1]
-            try:
-                papers[authorid].append(paperid)
-            except KeyError:
-                papers[authorid] = [paperid]
-        except IndexError:
-            pass
-    return papers
+from common import get_author_papers, get_train, get_valid
 
 def get_venue():
     venue, linestr = {}, ''
@@ -50,14 +37,6 @@ def get_venue():
             pass
     return venue
     
-def get_train():
-    lines = open('Data/Train.csv').readlines()[1:]
-    confirmed, deleted = {}, {}
-    for line in lines:
-        aid, conf, dele = line.strip().split(',')
-        confirmed[aid] = conf.split()
-        deleted[aid] = dele.split()
-    return confirmed, deleted
 
 def get_ps(confirmed, venue):
     # n1(v1) and n2(v1, v2), and their normalizations
@@ -139,11 +118,11 @@ def ps_without_author(aid, confirmed, venue, P1All, P2All, norm1All, norm2All):
 
 if __name__ == '__main__':
     venue = get_venue()
+
     confirmed, deleted = get_train()
-
     P1All, P2All, norm1All, norm2All = get_ps(confirmed, venue)
-
     count, tot = 0, len(confirmed)
+    outf = open('venue.train.dat', 'w')
     for aid in confirmed:
         count += 1
         print >> sys.stderr, '%d / %d' % (count, tot)
@@ -165,4 +144,20 @@ if __name__ == '__main__':
             others = [p for p in all if p != p1]
             s = get_score(p1, others, venue, P1, P2)
             if s > -.5 :
-                print aid, p1, s, tf
+                print >> outf, aid, p1, s, tf
+    outf.close()
+
+    validation = get_valid()
+    count, tot = 0, len(validation)
+    outf = open('venue.valid.dat', 'w')
+    for aid in validation:
+        count += 1
+        print >> sys.stderr, '%d / %d' % (count, tot)
+
+        all = validation[aid]
+        for p1 in all:
+            others = [p for p in all if p != p1]
+            s = get_score(p1, others, venue, P1All, P2All)
+            if s > -.5 :
+                print >> outf, aid, p1, s
+    outf.close()

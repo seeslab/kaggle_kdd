@@ -39,3 +39,7 @@ qsub.sh.*
 *~
 .idea
 data
+Data/
+Old/
+nohup.out
+kk.dat

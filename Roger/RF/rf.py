@@ -15,9 +15,9 @@ COLUMNS = (
     ('nname', '../nname.results.dat', 3),
     ('npapers', '../npapers.results.dat', 3),
     ('nauthors', '../nauthors.results.dat', 3),
-    ('coauthors', '../coauthors_diff.results.dat', 3),
+    ('coauthors', '../coauthors_diff.train.dat', 3),
     ## ('zcoauthors', '../coauthors_diff.results.dat', 4),
-    ('affiliation', '../../Marta/paper_affil.result.dat', 3),
+    ('affiliation', '../paper_affil.train.dat', 3),
     )
 
 if __name__ == '__main__':
@@ -60,15 +60,15 @@ if __name__ == '__main__':
 
     print rf.get_params()
 
-    # SVM
-    svc = svm.SVC(kernel='rbf')
-    svc.fit(xTrain, yTrain)
-    print svc.score(xTrain, yTrain)
-    print svc.score(xTest, yTest)
+    ## # SVM
+    ## svc = svm.SVC(kernel='rbf')
+    ## svc.fit(xTrain, yTrain)
+    ## print svc.score(xTrain, yTrain)
+    ## print svc.score(xTest, yTest)
 
-    # Logit
-    logit = linear_model.LogisticRegression()
-    logit.fit(xTrain, yTrain)
-    print logit.score(xTrain, yTrain)
-    print logit.score(xTest, yTest)
+    ## # Logit
+    ## logit = linear_model.LogisticRegression()
+    ## logit.fit(xTrain, yTrain)
+    ## print logit.score(xTrain, yTrain)
+    ## print logit.score(xTest, yTest)
 
