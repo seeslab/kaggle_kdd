@@ -3,6 +3,11 @@ import re
 from numpy import mean
 from Bio.pairwise2 import align
 
+from common import get_author_papers, get_train, get_valid
+
+from kaggle_kdd.models import *
+from fabric.api import *
+
 def kw_align_score(kws1, kws2):
     maxScore = 0.0
     for kw1 in [k for k in kws1 if len(k) > 5]:
@@ -22,54 +27,78 @@ def parse_kw(kwstring):
             k.strip() != '']
 
 def get_kws():
-    kws, linestr = {}, ''
-    lines = open('Data/Paper.csv').readlines()[1:]
-    for line in lines:
-        linestr += line.strip()
-        try:
-            paperid = linestr.strip().split(',')[0]
-            kwstring = linestr.strip().split(',')[5]
-            thekws = parse_kw(kwstring)
-            if thekws != []:
-                kws[paperid] = thekws
-            linestr = ''
-            ## print >> sys.stderr, paperid, kws[paperid]
-        except IndexError:
-            pass
+    kws = {}
+    for paper in Paper.objects.all():
+        kws[paper.id] = parse_kw(paper.keywords_string)
     return kws
 
-def get_train():
-    lines = open('Data/Train.csv').readlines()[1:]
-    confirmed, deleted = {}, {}
-    for line in lines:
-        aid, conf, dele = line.strip().split(',')
-        confirmed[aid] = conf.split()
-        deleted[aid] = dele.split()
-    return confirmed, deleted
-
-
-if __name__ == '__main__':
-    confirmed, deleted = get_train()
+@task
+def get_kw_score(start=None, nauthors=100):
     kws = get_kws()
 
-    print kws['559225']
-
-    for aid in confirmed:
+    print >> sys.stderr, 'Training set...'
+    confirmed, deleted = get_train()
+    aids = confirmed.keys()[:]
+    naids = len(aids)
+    if start != None:
+        start=int(start)
+        nauthors=int(nauthors)
+        aids = aids[
+            min(naids, nauthors * (start - 1)) :
+            min(naids, nauthors * start)
+            ]
+        outFileName = 'keywords.train_%d-%d.dat' % (
+            min(naids, nauthors * (start - 1)),
+            min(naids, nauthors * start)
+            )
+    else:
+        outFileName = 'keywords.train.dat'
+    count, tot = 0, len(aids)
+    outf = open(outFileName, 'w')
+    for aid in aids:
+        count += 1
+        print >> sys.stderr, '%d / %d' % (count, tot)
         all = confirmed[aid] + deleted[aid]
-
-        for pid in [p for p in deleted[aid] if kws.has_key(p)]:
-            score = mean(
+        for pid in all:
+            if pid in confirmed[aid]:
+                tf = 'T'
+            else:
+                tf = 'F'
+            scoren = len(kws[pid])
+            scorea = mean(
                 [kw_align_score(kws[pid], kws[pid2])
-                 for pid2 in all
-                 if pid2 != pid and kws.has_key(pid2)]
+                 for pid2 in all if pid2 != pid]
                 )
-            print aid, pid, score, 'F'
+            print >> outf, aid, pid, scorea, scoren, tf
+    outf.close()
 
-        for pid in [p for p in confirmed[aid] if kws.has_key(p)]:
-            score = mean(
+    print >> sys.stderr, 'Valid set...'
+    validation = get_valid()
+    aids = validation.keys()[:]
+    naids = len(aids)
+    if start != None:
+        aids = aids[
+            min(naids, nauthors * (start - 1)) :
+            min(naids, nauthors * start)
+            ]
+        outFileName = 'keywords.valid_%d-%d.dat' % (
+            min(naids, nauthors * (start - 1)),
+            min(naids, nauthors * start)
+            )
+    else:
+        outFileName = 'keywords.valid.dat'
+    count, tot = 0, len(aids)
+    outf = open(outFileName, 'w')
+    for aid in aids:
+        all = validation[aid]
+        for pid in all:
+            scoren = len(kws[pid])
+            scorea = mean(
                 [kw_align_score(kws[pid], kws[pid2])
-                 for pid2 in all
-                 if pid2 != pid and kws.has_key(pid2)]
+                 for pid2 in all if pid2 != pid]
                 )
-            print aid, pid, score, 'T'
+            print >> outf, aid, pid, scorea, scoren
+    outf.close()
 
+if __name__ == '__main__':
+    get_kw_score()

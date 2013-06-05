@@ -1,4 +1,4 @@
- sys
+import sys
 from time import strftime, localtime
 import numpy as np
 from random import choice, shuffle
@@ -11,17 +11,23 @@ sys.path.append('..')
 
 COLUMNS = (
     ('TF', '../npapers', 4),
+    ('venue', '../venue', 3),
     ('njournal', '../nvenue', 3),
     ('nconference', '../nvenue', 4),
-    ('venue', '../venue', 3),
     ('name', '../name', 3),
-    ## ('nameinit', '../name.results.dat', 4),
+    ## ('nameinit', '../name', 4),
 #    ('nname', '../nname', 3),
     ('npapers', '../npapers', 3),
     ('nauthors', '../nauthors', 3),
 #    ('coauthors', '../coauthors_diff', 3),
     ## ('zcoauthors', '../coauthors_diff', 4),
-    ## ('affiliation', '../paper_affil', 3),
+    ('affiliation', '../affiliation', 3),
+    ('year', '../year', 3),
+    ('nvalidated', '../nvalidated', 3),
+    ('sumcoauthors', '../sumcoauthors', 3),
+    ('kw', '../keywords', 3),
+    ('nkw', '../keywords', 4),
+    ## ('kwNorm', '../keywords_norm', 3),
     )
 
 def get_valid():

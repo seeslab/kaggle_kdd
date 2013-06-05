@@ -9,6 +9,7 @@ F = 0.95
 
 COLUMNS = (
     ('TF', '../npapers.train.dat', 4),
+    ## ('paperid', '../npapers.train.dat', 2),
     ('venue', '../venue.train.dat', 3),
     ('njournal', '../nvenue.train.dat', 3),
     ('nconference', '../nvenue.train.dat', 4),
@@ -19,7 +20,10 @@ COLUMNS = (
     ('nauthors', '../nauthors.train.dat', 3),
 #    ('coauthors', '../coauthors_diff.train.dat', 3),
     ## ('zcoauthors', '../coauthors_diff.train.dat', 4),
-#    ('affiliation', '../affiliation.train.dat', 3),
+    ('affiliation', '../affiliation.train.dat', 3),
+    ('year', '../year.train.dat', 3),
+    ('nvalidated', '../nvalidated.train.dat', 3),
+    ('sumcoauthors', '../sumcoauthors.train.dat', 3),
     )
 
 if __name__ == '__main__':
@@ -62,15 +66,15 @@ if __name__ == '__main__':
 
     print rf.get_params()
 
-    ## # SVM
-    ## svc = svm.SVC(kernel='rbf')
-    ## svc.fit(xTrain, yTrain)
-    ## print svc.score(xTrain, yTrain)
-    ## print svc.score(xTest, yTest)
+##     # SVM
+##     svc = svm.SVC(kernel='rbf')
+##     svc.fit(xTrain, yTrain)
+##     print svc.score(xTrain, yTrain)
+##     print svc.score(xTest, yTest)
 
-    ## # Logit
-    ## logit = linear_model.LogisticRegression()
-    ## logit.fit(xTrain, yTrain)
-    ## print logit.score(xTrain, yTrain)
-    ## print logit.score(xTest, yTest)
+    # Logit
+    logit = linear_model.LogisticRegression()
+    logit.fit(xTrain, yTrain)
+    print logit.score(xTrain, yTrain)
+    print logit.score(xTest, yTest)
 

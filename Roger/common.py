@@ -54,7 +54,7 @@ def get_train():
 
 def get_author_papers():
     papers, authors = {}, {}
-    for paper_author in PaperAuthor.objects.all()[:1000]:
+    for paper_author in PaperAuthor.objects.all():
         try:
             papers[paper_author.authorId].append(paper_author.paperId)
         except KeyError:

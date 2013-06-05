@@ -32,7 +32,7 @@ def get_sum_coauthors():
     print >> sys.stderr, 'Calculating scores for train set...'
     confirmed, deleted = get_train()
     print confirmed
-    outf = open('npapers.train.dat', 'w')
+    outf = open('sumcoauthors.train.dat', 'w')
     for aid in confirmed:
         allPapers = confirmed[aid] + deleted[aid]
         for p1 in allPapers:
@@ -52,7 +52,7 @@ def get_sum_coauthors():
 
     print >> sys.stderr, 'Calculating scores for validation set...'
     validation = get_valid()
-    outf = open('npapers.valid.dat', 'w')
+    outf = open('sumcoauthors.valid.dat', 'w')
     for aid in validation:
         allPapers = validation[aid]
         for p1 in allPapers:
@@ -62,11 +62,6 @@ def get_sum_coauthors():
                     sum_coauthors += num_collaborations[(author,aid)]
                 elif aid<author:
                     sum_coauthors += num_collaborations[(aid,author)]
-
-            if p1 in confirmed[aid]:
-                tf = 'T'
-            else:
-                tf = 'F'
             print >> outf, aid, p1, sum_coauthors
     outf.close()
 

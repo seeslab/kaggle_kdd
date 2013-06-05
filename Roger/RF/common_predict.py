@@ -23,10 +23,10 @@ def read_data_col(inFileName, aidCol=1, pidCol=2, valCol=3):
     return data
 
 
-def create_matrix(dataCols):
-    # Find aid-pid paird
+def create_matrix(dataCols, exclude_aids=[], return_pairs=False):
+    # Find aid-pid pairs
     pairs = []
-    for aid in dataCols.values()[0]:
+    for aid in [a for a in dataCols.values()[0] if a not in exclude_aids]:
         for pid in dataCols.values()[0][aid]:
             addpair = True
             for dataCol in dataCols.values():
@@ -50,6 +50,9 @@ def create_matrix(dataCols):
     colnames = vec.get_feature_names()
 
     # Done
-    return data, colnames
+    if return_pairs:
+        return data, colnames, pairs
+    else:
+        return data, colnames
 
 

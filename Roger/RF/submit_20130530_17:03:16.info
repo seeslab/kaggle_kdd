@@ -1,0 +1,7 @@
+('TF', '../npapers', 4)
+('njournal', '../nvenue', 3)
+('nconference', '../nvenue', 4)
+('venue', '../venue', 3)
+('name', '../name', 3)
+('npapers', '../npapers', 3)
+('nauthors', '../nauthors', 3)

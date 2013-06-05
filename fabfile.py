@@ -15,3 +15,7 @@ import Roger.name
 import Roger.affiliation
 
 import Roger.sumcoauthors
+
+import Roger.year
+import Roger.nvalidated
+import Roger.keywords
